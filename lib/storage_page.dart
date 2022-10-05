@@ -63,10 +63,19 @@ class _StoragePageState extends State<StoragePage> {
             total = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
           });
         } else if(snapshot.state == TaskState.success) {
+          arquivos.add(await snapshot.ref.getDownloadURL());
+          refs.add(snapshot.ref);
           setState(() => uploading = false);
         }
       });
     }
+  }
+
+  deleteImage(int index) async {
+    await storage.ref(refs[index].fullPath).delete();
+    arquivos.removeAt(index);
+    refs.removeAt(index);
+    setState(() {});
   }
 
   @override
@@ -99,7 +108,31 @@ class _StoragePageState extends State<StoragePage> {
         ],
         elevation: 0,
       ),
-      body: Container(),
+      body: loading
+      ? const Center(child: CircularProgressIndicator(),)
+      : Padding(
+        padding: const EdgeInsets.all(24),
+        child: arquivos.isEmpty
+        ? const Center(child: Text('Não há imagens ainda'))
+        : ListView.builder(itemBuilder: (_, index) {
+          return ListTile(
+            leading: SizedBox(
+              width: 60,
+              height: 40,
+              child: Image.network(
+                arquivos[index],
+                fit: BoxFit.cover
+              ),
+            ),
+            title: Text(refs[index].fullPath),
+            trailing: IconButton(
+              icon: Icon(Icons.delete),
+              onPressed: () => deleteImage(index),
+            ),
+          );
+        },
+        itemCount: arquivos.length),
+      ),
     );
   }
 }
