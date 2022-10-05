@@ -26,7 +26,7 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.yellow,
         brightness: Brightness.dark,
       ),
-      home:  StoragePage(),
+      home: StoragePage(),
     );
   }
 }

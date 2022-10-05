@@ -2,7 +2,7 @@ import 'dart:io';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-
+import 'package:flutter_native_image/flutter_native_image.dart';
 
 class StoragePage extends StatefulWidget {
   const StoragePage({ Key? key }) : super(key: key);
@@ -35,10 +35,16 @@ class _StoragePageState extends State<StoragePage> {
     });
   }
 
-  Future<XFile?> getImage() async {
+  Future<File> compressImage(String filePath) async {
+    File compressedFile = await FlutterNativeImage.compressImage(filePath, quality: 70, percentage: 40);
+    return compressedFile;
+  }
+
+  Future<File?> getImageCompress() async {
     final ImagePicker _picker = ImagePicker();
     XFile? image = await _picker.pickImage(source: ImageSource.gallery);
-    return image;
+    File compress = await compressImage(image!.path);
+    return compress;
   }
 
   Future<UploadTask> upload(String path) async {
@@ -52,7 +58,8 @@ class _StoragePageState extends State<StoragePage> {
   }
 
   pickAndUploadImage() async {
-    XFile? file = await getImage();
+    File? file = await getImageCompress();
+
     if(file != null) {
       UploadTask task = await upload(file.path);
 
